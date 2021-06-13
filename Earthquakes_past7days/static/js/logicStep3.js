@@ -45,13 +45,33 @@ d3.json('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
         return {
             opacity: 1,
             fillOpacity: 1,
-            fillColor: '#ffae42',
+            fillColor: getColor(feature.properties.mag),
             color: '#000000',
             radius: getRadius(feature.properties.mag),
             stroke: true,
             weight: 0.5
         }
     }
+
+     // Determine the color of the earthquake marker by its magnitude
+     function getColor(magnitude) {
+        if (magnitude > 5) {
+          return "#ea2c2c";
+        }
+        if (magnitude > 4) {
+          return "#ea822c";
+        }
+        if (magnitude > 3) {
+          return "#ee9c00";
+        }
+        if (magnitude > 2) {
+          return "#eecc00";
+        }
+        if (magnitude > 1) {
+          return "#d4ee00";
+        }
+        return "#98ee00";
+      }
 
     // Determine the radius of earthquake marker by its magnitude 
     function getRadius(magnitude) {
@@ -61,15 +81,23 @@ d3.json('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
         return magnitude * 4;
     }
 
+   
+
     // Creating a GeoJSON layer with the retrieved data.
     L.geoJson(data, {
+      // Turn each feature into a circleMarker
         pointToLayer: function(feature, latlng) {
                     console.log(data);
                     return L.circleMarker(latlng);
                 },
-        style: styleInfo
+        // Set style
+        style: styleInfo,
+        // Create a popup for each marker -- display magnitude and location
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup(`Magnitude: ${feature.properties.mag} <br>Location: ${feature.properties.place}`);
+        }
             }).addTo(map);
-        });
+});
 
 
 // Then we add our 'graymap' tile layer to the map.
